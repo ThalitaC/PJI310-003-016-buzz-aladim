@@ -1,8 +1,9 @@
 import express  from "express";
-import {getItens} from "../controller/controller.js";
+import {getAlunos, addAluno} from "../controller/controller.js";
 
 const router = express.Router();
 
-router.get("/", getItens);
+router.get("/", getAlunos);
+router.post("/", addAluno);
 
 export default router;
