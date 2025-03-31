@@ -43,3 +43,33 @@ export const addAluno = (req, res) => {
         }
     });
 };
+
+export const deleteAluno = (req, res) => {
+    const sqlQuery = "DELETE FROM alunos WHERE id = ?";
+    db.query(sqlQuery, [req.params.id], (err, result) => {
+        if (err) return res.json(err);
+        return res.status(200).json("Aluno deletado com sucesso!");
+    });
+};
+
+export const updateAluno = (req, res) => {
+    const sqlQuery = "UPDATE alunos SET `nome_aluno` = ?, `data_nascimento` = ?, `horario_entrada` = ?, `horario_saida` = ?, `nome_responsavel` = ?, `endereco` = ?, `telefone` = ?, `escola` = ?, `mensalidade` = ? WHERE id = ?";
+
+    const values = [
+        req.body.nome_aluno,
+        req.body.data_nascimento,
+        req.body.horario_entrada,
+        req.body.horario_saida,
+        req.body.nome_responsavel,
+        req.body.endereco,
+        req.body.telefone,
+        req.body.escola,
+        req.body.mensalidade,
+        req.params.id
+    ];
+
+    db.query(sqlQuery, values, (err, result) => {
+        if (err) return res.json(err);
+        return res.status(200).json("Aluno atualizado com sucesso!");
+    });
+};

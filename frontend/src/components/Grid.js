@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { FaTrash, FaEdit } from "react-icons/fa";
@@ -42,9 +42,7 @@ export const Td = styled.td`
   }
 `;
 
-const Grid = ({setOnEdit}) => {
-    const [alunos, setAlunos] = useState([]);
-
+const Grid = forwardRef(({setOnEdit, alunos, setAlunos, setIsModalOpen}, ref) => {
     const getAlunos = async () => {
         try {
             const res = await axios.get(process.env.REACT_APP_URL || "http://localhost:8080");
@@ -58,16 +56,20 @@ const Grid = ({setOnEdit}) => {
         getAlunos();
     }, []);
 
+    useImperativeHandle(ref, () => ({
+        getAlunos
+    }));
+
     const handleEdit = (item) => {
         setOnEdit(item);
+        setIsModalOpen(true);
     };
 
     const handleDelete = async (id) => {
         await axios
-            .delete(process.env.REACT_APP_URL || "http://localhost:8080" + "/" + id)
+            .delete(`${process.env.REACT_APP_URL || "http://localhost:8080/"}${id}`)
             .then(({ data }) => {
                 const newArray = alunos.filter((aluno) => aluno.id !== id);
-
                 setAlunos(newArray);
                 toast.success(data);
             })
@@ -108,23 +110,30 @@ const Grid = ({setOnEdit}) => {
                                 <FaEdit
                                     className="icon"
                                     onClick={() => handleEdit(item)}
+                                    style={{ cursor: 'pointer', color: '#0D6EFD' }}
                                 />
                             </Td>
                             <Td>
                                 <FaTrash
                                     className="icon"
                                     onClick={() => handleDelete(item.id)}
+                                    style={{ cursor: 'pointer', color: '#DC3545' }}
+                                    title="Deletar aluno"
                                 />
                             </Td>
                         </Tr>
                     ))
                 ) : (
-                    <p>Loading...</p>
+                    <Tr>
+                        <Td colSpan="9" alignCenter>
+                            <div class="spinner-border" role="status" />
+                        </Td>
+                    </Tr>
                 )}
             </Tbody>
         </Table>
     );
 
-};
+});
 
 export default Grid;
