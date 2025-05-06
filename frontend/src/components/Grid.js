@@ -42,11 +42,15 @@ export const Td = styled.td`
   }
 `;
 
-const Grid = forwardRef(({setOnEdit, alunos, setAlunos, setIsModalOpen}, ref) => {
+const Grid = forwardRef(({setOnEdit, alunos, setAlunos, setIsModalOpen, searchTerm}, ref) => {
+    const [filteredAlunos, setFilteredAlunos] = useState([]);
+
     const getAlunos = async () => {
         try {
             const res = await axios.get(process.env.REACT_APP_URL || "http://localhost:8080");
-            setAlunos(res.data.sort((a, b) => (a.nome > b.nome ? 1 : -1)));
+            const sortedAlunos = res.data.sort((a, b) => (a.nome > b.nome ? 1 : -1));
+            setAlunos(sortedAlunos);
+            setFilteredAlunos(sortedAlunos);
         } catch (error) {
             toast.error(error);
         }
@@ -55,6 +59,13 @@ const Grid = forwardRef(({setOnEdit, alunos, setAlunos, setIsModalOpen}, ref) =>
     useEffect(() => {
         getAlunos();
     }, []);
+
+    useEffect(() => {
+        const filtered = alunos.filter(aluno =>
+            aluno.nome_aluno.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredAlunos(filtered);
+    }, [searchTerm, alunos]);
 
     useImperativeHandle(ref, () => ({
         getAlunos
@@ -94,8 +105,8 @@ const Grid = forwardRef(({setOnEdit, alunos, setAlunos, setIsModalOpen}, ref) =>
                 </Tr>
             </Thead>
             <Tbody>
-                {alunos.length > 0 ? (
-                    alunos.map((item) => (
+                {filteredAlunos.length > 0 ? (
+                    filteredAlunos.map((item) => (
                         <Tr key={item.id}>
                             <Td>{item.nome_aluno}</Td>
                             <Td>{item.data_nascimento}</Td>
@@ -133,7 +144,6 @@ const Grid = forwardRef(({setOnEdit, alunos, setAlunos, setIsModalOpen}, ref) =>
             </Tbody>
         </Table>
     );
-
 });
 
 export default Grid;
