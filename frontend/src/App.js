@@ -12,7 +12,7 @@ import { ThemeProvider as CustomThemeProvider, useTheme } from "./contexts/Theme
 
 const Container = styled.div`
   width: 100%;
-  max-width: 90%;
+  max-width: 100%;
   margin-top: 2em;
   display: flex;
   flex-direction: column;
